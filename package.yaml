@@ -53,3 +53,5 @@ tests:
     - -with-rtsopts=-N
     dependencies:
     - word2vec-model
+    - hspec
+    - HUnit
