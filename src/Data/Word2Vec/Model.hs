@@ -8,6 +8,7 @@ module Data.Word2Vec.Model
     , dotProduct
     , WVector
     , findNearestToWord
+    , buildWVector
     ) where
 
 import qualified Data.HashMap.Strict as DHS
@@ -23,7 +24,8 @@ import Data.Binary.Get
 import Data.Binary.IEEE754
 import Data.List (maximumBy)
 
-type WVector = V.Vector Float
+data WVector = WVector (V.Vector Float) Float
+               deriving (Eq, Show)
 
 data Word2VecModel = Word2VecModel Int Int !(DHS.HashMap T.Text WVector)
                      deriving (Eq, Show)
@@ -59,18 +61,24 @@ parseWord2VecEntry nbOfDimensions = do
   word <- AP.takeWhile1 (not . AP.isSpace)
   " "
   floatVectorRaw <- AP.take (floatSize * nbOfDimensions)
-  return (decodeUtf8 word, bytesToFloats floatVectorRaw)
+  return (decodeUtf8 word, buildWVector $ bytesToFloats floatVectorRaw)
 
-bytesToFloats :: BS.ByteString -> WVector
+bytesToFloats :: BS.ByteString -> V.Vector Float
 bytesToFloats = V.unsafeCast . aux . BS.toForeignPtr
   where aux (fp,offset,len) = V.unsafeFromForeignPtr fp offset len
 
+buildWVector :: V.Vector Float -> WVector
+buildWVector v = WVector v (normRooted v)
+
 cosineSimilarity :: WVector -> WVector -> Float
-cosineSimilarity veca vecb = (dotProduct veca vecb) / (sqrt ((norm veca) * (norm vecb)))
+cosineSimilarity (WVector veca snorma) (WVector vecb snormb) = (dotProduct veca vecb) / (snorma * snormb)
   where norm v = V.sum $ V.map (\e -> e * e) v
 
-dotProduct :: WVector -> WVector -> Float
+dotProduct :: V.Vector Float -> V.Vector Float -> Float
 dotProduct veca vecb = V.sum $ V.zipWith (*) veca vecb
+
+normRooted :: V.Vector Float -> Float
+normRooted = sqrt . V.sum . V.map (\e -> e * e)
 
 findNearestToWord :: Word2VecModel -> T.Text -> Maybe (T.Text, Float)
 findNearestToWord m@(Word2VecModel _ _ h) w = findNearestToWord' h <$> (getVector m w)

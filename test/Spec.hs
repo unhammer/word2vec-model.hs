@@ -14,12 +14,14 @@ main = hspec $ do
     it "dot product" $ do
       dotProduct (V.fromList [0.5, 0.0, -2.0]) (V.fromList [3.0, 5.3, 1.0]) `shouldBeAlmost` (-0.5)
     it "cosine similarity (dissimilar)" $ do
-      cosineSimilarity (V.fromList [0.0, 4.3]) (V.fromList [2.7, 0.0]) `shouldBeAlmost` 0.0
+      cosineSimilarity (getWVector [0.0, 4.3]) (getWVector [2.7, 0.0]) `shouldBeAlmost` 0.0
     it "cosine similarity (perfect similarity — trivial)" $ do
-      cosineSimilarity (V.fromList [1.0, 2.0]) (V.fromList [1.0, 2.0]) `shouldBeAlmost` 1.0
+      cosineSimilarity (getWVector [1.0, 2.0]) (getWVector [1.0, 2.0]) `shouldBeAlmost` 1.0
     it "cosine similarity (perfect similarity)" $ do
-      cosineSimilarity (V.fromList [1.0, -3.7]) (V.fromList [2.0, -7.4]) `shouldBeAlmost` 1.0
+      cosineSimilarity (getWVector [1.0, -3.7]) (getWVector [2.0, -7.4]) `shouldBeAlmost` 1.0
 
+getWVector :: [Float] -> WVector
+getWVector = buildWVector . V.fromList
 
 class AEq a where
     (=~) :: a -> a -> Bool
