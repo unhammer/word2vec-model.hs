@@ -68,17 +68,17 @@ bytesToFloats = V.unsafeCast . aux . BS.toForeignPtr
   where aux (fp,offset,len) = V.unsafeFromForeignPtr fp offset len
 
 buildWVector :: V.Vector Float -> WVector
-buildWVector v = WVector v (normRooted v)
+buildWVector v = WVector v (norm v)
 
 cosineSimilarity :: WVector -> WVector -> Float
-cosineSimilarity (WVector veca snorma) (WVector vecb snormb) = (dotProduct veca vecb) / (snorma * snormb)
+cosineSimilarity (WVector veca norma) (WVector vecb normb) = (dotProduct veca vecb) / (norma * normb)
   where norm v = V.sum $ V.map (\e -> e * e) v
 
 dotProduct :: V.Vector Float -> V.Vector Float -> Float
 dotProduct veca vecb = V.sum $ V.zipWith (*) veca vecb
 
-normRooted :: V.Vector Float -> Float
-normRooted = sqrt . V.sum . V.map (\e -> e * e)
+norm :: V.Vector Float -> Float
+norm = sqrt . V.sum . V.map (\e -> e * e)
 
 findNearestToWord :: Word2VecModel -> T.Text -> Maybe (T.Text, Float)
 findNearestToWord m@(Word2VecModel _ _ h) w = findNearestToWord' h <$> (getVector m w)
