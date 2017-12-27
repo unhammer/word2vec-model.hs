@@ -1,0 +1,55 @@
+name:                word2vec-model
+version:             0.1.0.0
+github:              "filipg/word2vec-model"
+license:             BSD3
+author:              "Filip Graliński"
+maintainer:          "filipg@amu.edu.pl"
+copyright:           "BSD3"
+
+extra-source-files:
+- README.md
+- ChangeLog.md
+
+# Metadata used when publishing your package
+synopsis:            Short description of your package
+# category:            Web
+
+# To avoid duplicated efforts in documentation and dealing with the
+# complications of embedding Haddock markup inside cabal files, it is
+# common to point users to the README.md file.
+description:         Please see the README on Github at <https://github.com/filipg/word2vec-model#readme>
+
+dependencies:
+- base >= 4.7 && < 5
+- attoparsec
+- binary
+- binary-ieee754
+- bytestring
+- text
+- vector
+- unordered-containers
+
+library:
+  source-dirs: src
+
+executables:
+  word2vec-model-exe:
+    main:                Main.hs
+    source-dirs:         app
+    ghc-options:
+    - -threaded
+    - -rtsopts
+    - -with-rtsopts=-N
+    dependencies:
+    - word2vec-model
+
+tests:
+  word2vec-model-test:
+    main:                Spec.hs
+    source-dirs:         test
+    ghc-options:
+    - -threaded
+    - -rtsopts
+    - -with-rtsopts=-N
+    dependencies:
+    - word2vec-model
