@@ -67,7 +67,7 @@ bytesToFloats = V.unsafeCast . aux . BS.toForeignPtr
 
 cosineSimilarity :: WVector -> WVector -> Float
 cosineSimilarity veca vecb = (dotProduct veca vecb) / (sqrt ((norm veca) * (norm vecb)))
-  where norm v = V.sum $ V.map (**2.0) v
+  where norm v = V.sum $ V.map (\e -> e * e) v
 
 dotProduct :: WVector -> WVector -> Float
 dotProduct veca vecb = V.sum $ V.zipWith (*) veca vecb
