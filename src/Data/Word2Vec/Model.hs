@@ -9,7 +9,7 @@ module Data.Word2Vec.Model
 import qualified Data.HashMap.Strict as DHS
 import Data.Text
 import Data.Text.Encoding
-import Data.Vector
+import Data.Vector.Storable
 import qualified Data.ByteString.Lazy as BL
 import qualified Data.Attoparsec.ByteString.Lazy as AL
 import qualified Data.Attoparsec.ByteString.Char8 as AP
