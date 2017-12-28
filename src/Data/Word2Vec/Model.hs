@@ -107,7 +107,7 @@ findKNearestToVector m@(Word2VecModel _ _ h) k v = reverse $ catMaybes
                                       insertInto v theRest
                                     else
                                       l
-        insertInto v [] = [Just v] -- not really needed, for completeness
+        insertInto v [] = [Just v]
         insertInto v l@(lowest:theRest) = if isBetter v lowest
                                         then
                                           (lowest:insertInto v theRest)
