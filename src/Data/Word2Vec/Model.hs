@@ -1,18 +1,36 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE BangPatterns #-}
 
+-----------------------------------------------------------------------------
+-- |
+-- Module      :  Data.Word2Vec.Model
+-- Copyright   :  Filip Graliński 2017
+-- License     :  BSD-style (see the LICENSE file in the distribution)
+--
+-- Maintainer  :  filipg@amu.edu.pl
+-- Stability   :  experimental
+-- Portability :  ?
+--
+-- Operating on word2vec binary models (generated with the original tool by Mikolov).
+--
+-----------------------------------------------------------------------------
+
 module Data.Word2Vec.Model
     ( readWord2VecModel
+
     , numberOfWords
     , numberOfDimensions
+
+    , WVector
+    , buildWVector
     , getVector
+
     , cosineSimilarity
     , dotProduct
-    , WVector
+
     , findNearestToWord
     , findKNearestToWord
     , findKNearestToVector
-    , buildWVector
     ) where
 
 import qualified Data.HashMap.Strict as DHS
