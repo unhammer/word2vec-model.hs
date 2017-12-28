@@ -3,11 +3,15 @@
 
 module Data.Word2Vec.Model
     ( readWord2VecModel
+    , numberOfWords
+    , numberOfDimensions
     , getVector
     , cosineSimilarity
     , dotProduct
     , WVector
     , findNearestToWord
+    , findKNearestToWord
+    , findKNearestToVector
     , buildWVector
     ) where
 
@@ -22,7 +26,8 @@ import qualified Data.Attoparsec.ByteString.Char8 as AP
 import Data.Binary
 import Data.Binary.Get
 import Data.Binary.IEEE754
-import Data.List (maximumBy)
+import Data.List (maximumBy, foldl')
+import Data.Maybe (catMaybes)
 
 data WVector = WVector (V.Vector Float) Float
                deriving (Eq, Show)
@@ -34,6 +39,12 @@ readWord2VecModel :: FilePath -> IO (Word2VecModel)
 readWord2VecModel fileName = do
   contents <- BL.readFile fileName
   pure $ processWord2VecBinaryModel contents
+
+numberOfWords :: Word2VecModel -> Int
+numberOfWords (Word2VecModel n _ _) = n
+
+numberOfDimensions :: Word2VecModel -> Int
+numberOfDimensions (Word2VecModel _ d _) = d
 
 getVector :: Word2VecModel -> T.Text -> Maybe WVector
 getVector (Word2VecModel _ _ h) w = DHS.lookup w h
@@ -79,6 +90,31 @@ dotProduct veca vecb = V.sum $ V.zipWith (*) veca vecb
 
 norm :: V.Vector Float -> Float
 norm = sqrt . V.sum . V.map (\e -> e * e)
+
+
+findKNearestToWord :: Word2VecModel -> Int -> T.Text -> [(T.Text, Float)]
+findKNearestToWord m k w = case getVector m w of
+  Just v -> filter (\(t,_) -> t /= w) $ findKNearestToVector m (k+1) v
+  Nothing -> []
+
+findKNearestToVector :: Word2VecModel -> Int -> WVector -> [(T.Text, Float)]
+findKNearestToVector m@(Word2VecModel _ _ h) k v = reverse $ catMaybes
+                                                 $ foldl' step (replicate k Nothing)
+                                                 $ map (\(w',v') -> (w', cosineSimilarity v' v)) $ DHS.toList h
+  where step [] v = [Just v] -- not really needed, for completeness
+        step l@(lowest:theRest) v = if isBetter v lowest
+                                    then
+                                      insertInto v theRest
+                                    else
+                                      l
+        insertInto v [] = [Just v] -- not really needed, for completeness
+        insertInto v l@(lowest:theRest) = if isBetter v lowest
+                                        then
+                                          (lowest:insertInto v theRest)
+                                        else
+                                          (Just v:l)
+        isBetter _ Nothing = True
+        isBetter (_, s1) (Just (_, s2)) = s1 > s2
 
 findNearestToWord :: Word2VecModel -> T.Text -> Maybe (T.Text, Float)
 findNearestToWord m@(Word2VecModel _ _ h) w = findNearestToWord' h <$> (getVector m w)

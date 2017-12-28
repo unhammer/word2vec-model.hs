@@ -1,3 +1,5 @@
+{-# LANGUAGE OverloadedStrings #-}
+
 import Test.Hspec
 
 import Data.Word2Vec.Model
@@ -5,6 +7,8 @@ import Data.Word2Vec.Model
 import qualified Data.Vector.Storable as V
 
 import qualified Test.HUnit as HU
+
+import Control.Monad
 
 main :: IO ()
 main = hspec $ do
@@ -19,6 +23,21 @@ main = hspec $ do
       cosineSimilarity (getWVector [1.0, 2.0]) (getWVector [1.0, 2.0]) `shouldBeAlmost` 1.0
     it "cosine similarity (perfect similarity)" $ do
       cosineSimilarity (getWVector [1.0, -3.7]) (getWVector [2.0, -7.4]) `shouldBeAlmost` 1.0
+  describe "reading a small binary model" $ do
+    it "find the most similar (cosine)" $ do
+      model <- readWord2VecModel "test/sample1.bin"
+      let Just (theWord, _) = findNearestToWord model "rębajło"
+      numberOfWords model `shouldBe` 3997
+      numberOfDimensions model `shouldBe` 20
+      theWord `shouldBe` "asesor"
+    it "find K most similar ones (cosine)" $ do
+      model <- readWord2VecModel "test/sample1.bin"
+      (map fst $ findKNearestToWord model 5 "umiał") `shouldBe` ["myśliłem",
+                                                                 "myślili",
+                                                                 "złości",
+                                                                 "złość",
+                                                                 "czas"]
+
 
 getWVector :: [Float] -> WVector
 getWVector = buildWVector . V.fromList
