@@ -14,7 +14,7 @@
 -- Reading word2vec binary models (generated with the original tool by Mikolov).
 --
 -- This simple module is only for /reading/ word2vec models (it cannot be used
--- to /generate/ a word2vec model, for this the original word2vec tools should be used.
+-- to /generate/ a word2vec model, for this the original word2vec tools should be used).
 --
 -- Note that word2vec binary format is not a proper serialisation format (as it is mostly
 -- a raw dump of C data. /Caveat emptor/, it might be risky to read a model generated
@@ -23,10 +23,8 @@
 -- Example:
 --
 -- @
---   {-# LANGUAGE OverloadedStrings #-}
---
 --   model <- readWord2VecModel "binary.bin"
---   let theMostSimilar = findKNearestToWord w2v 30 "polska"
+--   let theMostSimilar = findKNearestToWord w2v 30 "bar"
 -- @
 --
 -----------------------------------------------------------------------------
@@ -147,7 +145,7 @@ normalizeVector (WVector v n) = buildWVector (V.map (/ n) v)
 
 -- | Calculate cosine similarity between two word2vec vectors.
 --
--- Note it was called wrongly /cosine distance/ in the original word2vec.
+-- Note that it was called wrongly /cosine distance/ in the original word2vec.
 cosineSimilarity :: WVector -> WVector -> Float
 cosineSimilarity (WVector veca norma) (WVector vecb normb) = (dotProduct veca vecb) / (norma * normb)
   where norm v = V.sum $ V.map (\e -> e * e) v
