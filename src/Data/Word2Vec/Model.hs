@@ -43,13 +43,15 @@ module Data.Word2Vec.Model
     , WVector
     , buildWVector
     , getVector
+    , normalizeVector
 
       -- * Looking for the nearest vector
       --
-      -- (Like the distance tool in the original word2vec.)
+      -- (Like the distance/word-analogy tools in the original word2vec.)
     , findNearestToWord
     , findKNearestToWord
     , findKNearestToVector
+    , solveWordAnalogy
 
       -- * Helper functions
     , cosineSimilarity
@@ -136,6 +138,10 @@ bytesToFloats = V.unsafeCast . aux . BS.toForeignPtr
 buildWVector :: V.Vector Float -> WVector
 buildWVector v = WVector v (norm v)
 
+-- | Normalise a vector with its norm
+normalizeVector :: WVector -> WVector
+normalizeVector (WVector v n) = buildWVector (V.map (/ n) v)
+
 -- | Calculate cosine similarity between two word2vec vectors.
 --
 -- Note it was called wrongly /cosine distance/ in the original word2vec.
@@ -186,3 +192,22 @@ findNearestToWord m@(Word2VecModel _ _ h) w = findNearestToWord' h <$> (getVecto
    where findNearestToWord' h v = maximumBy (\(_,p) (_, q) -> p `compare` q)
                                   $ map (\(w',v') -> (w', cosineSimilarity v' v))
                                   $ filter (\(w',_) -> w' /= w) $ DHS.toList h
+
+solveWordAnalogy :: Word2VecModel -> Int -> T.Text -> T.Text -> T.Text -> [(T.Text, Float)]
+solveWordAnalogy m k a1 a2 b1 = case targetVector of
+  Just v -> findKNearestToVector m k v
+  Nothing -> []
+  where targetVector = getVectorByAnalogy <$>
+                                (getVector m a1) <*> (getVector m a2) <*> (getVector m b1)
+        getVectorByAnalogy v1 v2 u1 = vadd (normalizeVector u1) (vsubtract (normalizeVector v2)
+                                                                           (normalizeVector v1))
+
+pointWiseOperation :: (Float -> Float -> Float) -> WVector -> WVector -> WVector
+pointWiseOperation fun (WVector v1 _) (WVector v2 _) =
+  buildWVector $ V.zipWith fun v1 v2
+
+vadd :: WVector -> WVector -> WVector
+vadd = pointWiseOperation (+)
+
+vsubtract :: WVector -> WVector -> WVector
+vsubtract = pointWiseOperation (-)

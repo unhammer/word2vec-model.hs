@@ -37,7 +37,14 @@ main = hspec $ do
                                                                  "złości",
                                                                  "złość",
                                                                  "czas"]
-
+    it "solve a word analogy puzzle" $ do
+      model <- readWord2VecModel "test/sample1.bin"
+      (map fst $ solveWordAnalogy model 5 "tadeusz" "polska" "zosia") `shouldBe` [
+          "polska",
+          "kochany",
+          "polski",
+          "dziewczyny",
+          "naród" ]
 
 getWVector :: [Float] -> WVector
 getWVector = buildWVector . V.fromList
