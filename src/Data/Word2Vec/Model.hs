@@ -33,8 +33,11 @@
 
 module Data.Word2Vec.Model
     (
+      -- * Main data structure
+      Word2VecModel
+
       -- * Basic operations
-      readWord2VecModel
+    , readWord2VecModel
 
     , numberOfWords
     , numberOfDimensions
