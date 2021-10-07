@@ -24,7 +24,7 @@
 --
 -- @
 --   model <- readWord2VecModel "binary.bin"
---   let theMostSimilar = findKNearestToWord w2v 30 "bar"
+--   let theMostSimilar = findKNearestToWord model 30 "bar"
 -- @
 --
 -----------------------------------------------------------------------------
