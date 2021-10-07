@@ -33,6 +33,7 @@ module Data.Word2Vec.Model
     (
       -- * Main data structure
       Word2VecModel
+    , empty
 
       -- * Basic operations
     , readWord2VecModel
@@ -84,6 +85,10 @@ data Word2VecModel = Word2VecModel Int -- number of words
                                    Int -- number of dimensions
                                    !(DHS.HashMap T.Text WVector) -- word-to-vector map
                      deriving (Eq, Show)
+
+-- | /O(1)/ Construct an empty model.
+empty :: Word2VecModel
+empty = Word2VecModel 0 0 mempty
 
 -- | Main function, reading a word2vec binary model into memory.
 readWord2VecModel :: FilePath -> IO (Word2VecModel)
