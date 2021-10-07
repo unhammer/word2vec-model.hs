@@ -36,7 +36,7 @@ library:
 executables:
   word2vec-model-similarity:
     main:                Similarity.hs
-    source-dirs:         app
+    source-dirs:         app-similarity
     ghc-options:
     - -threaded
     - -rtsopts
@@ -48,7 +48,7 @@ executables:
     - conduit-extra
   word2vec-model-word-analogy:
     main:                WordAnalogy.hs
-    source-dirs:         app
+    source-dirs:         app-analogy
     ghc-options:
     - -threaded
     - -rtsopts
