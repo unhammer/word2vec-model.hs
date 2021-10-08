@@ -42,7 +42,10 @@ module Data.Word2Vec.Model
     , numberOfDimensions
 
       -- * Operations on vectors
-    , WVector
+    , WVector(..)
+    , zero
+    , vadd
+    , vsubtract
     , buildWVector
     , getVector
     , normalizeVector
@@ -107,6 +110,12 @@ numberOfDimensions (Word2VecModel _ d _) = d
 -- | /(Practically) O(1)/ Get a vector for a given word.
 getVector :: Word2VecModel -> T.Text -> Maybe WVector
 getVector (Word2VecModel _ _ h) w = DHS.lookup w h
+
+-- | Construct a word vector with all zeros, of the right dimension for this model.
+--
+-- Useful as identity when summing word vectors, e.g. 'foldr vadd zero someVectors'
+zero :: Word2VecModel -> WVector
+zero (Word2VecModel _ dim _) = buildWVector (V.replicate dim 0)
 
 processWord2VecBinaryModel :: BL.ByteString -> Word2VecModel
 processWord2VecBinaryModel contents =
