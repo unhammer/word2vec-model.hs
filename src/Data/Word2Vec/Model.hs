@@ -153,7 +153,6 @@ normalizeVector (WVector v n) = buildWVector (V.map (/ n) v)
 -- Note that it was called wrongly /cosine distance/ in the original word2vec.
 cosineSimilarity :: WVector -> WVector -> Float
 cosineSimilarity (WVector veca norma) (WVector vecb normb) = (dotProduct veca vecb) / (norma * normb)
-  where norm v = V.sum $ V.map (\e -> e * e) v
 
 -- | Calculate dot product between two word2vec vectors
 dotProduct :: V.Vector Float -> V.Vector Float -> Float
